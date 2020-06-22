@@ -2,9 +2,14 @@
   "name": "rails_sandbox_6_0_3_1",
   "private": true,
   "dependencies": {
-    "@rails/ujs": "^6.0.0",
+    "@rails/actioncable": "^6.0.0",
     "@rails/activestorage": "^6.0.0",
-    "@rails/actioncable": "^6.0.0"
+    "@rails/ujs": "^6.0.0",
+    "@rails/webpacker": "4.2.2",
+    "bootstrap": "^5.0.0-alpha1"
   },
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.0"
+  }
 }

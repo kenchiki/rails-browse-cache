@@ -1,0 +1,46 @@
+<h1>ETagが固定または更新された場合</h1>
+<h2 class="mt-4">Railsによる現在の時間</h2>
+<p><%= Time.current.strftime('%T') %></p>
+<p><%= link_to '他のページに遷移', home_case5_other_path %></p>
+<p><%= link_to 'モデルを作成する(ETagの値を更新する)', home_case5_create_path %></p>
+<h2 class="mt-4">JSによる時間出力</h2>
+<script>
+  function outputTime() {
+    document.open()
+    const now = new Date()
+
+    document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
+    document.close()
+  }
+  outputTime()
+</script>
+<h2 class="mt-4">豆知識</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+    <h3>結論</h3>
+    <ul>
+      <li>ETag(検証)の値が固定の場合は更新されず、更新された時にキャッシュは更新される</li>
+      <li>この場合、no-storeと違ってリロードでもキャッシュは更新されなかった</li>
+    </ul>
+    <h3 class="mt-4">ETagとno-store一緒に設定した場合、どうなるか</h3>
+    <ul>
+      <li>max-age=0 が暗黙で含まれます。 must-revalidate は意味を持ちません。再検証を行うにはレスポンスがキャッシュに格納されている必要がありますが、 no-store はこれを抑止するからです。</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control#Cacheability</li>
+    </ul>
+    <h3 class="mt-4">ETagを削除することもできる</h3>
+    <ul>
+      <li>config/application.rb に config.middleware.delete Rack::ETag を追加</li>
+      <li>上記でETagがなくすとCache-Controlもレスポンスヘッダーから消える(デフォルトのno-cacheが適用されてキャッシュが残らなくなる)</li>
+      <li>https://railsguides.jp/rails_on_rack.html#%E3%83%9F%E3%83%89%E3%83%AB%E3%82%A6%E3%82%A7%E3%82%A2%E3%82%92%E5%89%8A%E9%99%A4%E3%81%99%E3%82%8B</li>
+    </ul>
+    <h3 class="mt-4">expires_in 10.secondsとfresh_when(Blog.last)を同時に使ったらどうなるか</h3>
+    <ul>
+      <li>fresh_when(Blog.last)が優先されて、ETagの値は固定された</li>
+      <li>そのため、時間は固定された</li>
+    </ul>
+    <h3 class="mt-4">ETag固定の状態でctrl+F5(macだったらcommand+shift+r)を押すとどうなるか</h3>
+    <ul>
+      <li>ETagの値は固定されたままだが、キャッシュは更新された</li>
+    </ul>
+  </div>
+</div>

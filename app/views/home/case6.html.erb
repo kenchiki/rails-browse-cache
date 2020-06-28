@@ -1,0 +1,32 @@
+<h1>VueJSでDOM操作のキャッシュ(ページにno-store)</h1>
+<h2 class="mt-4">Railsによる現在の時間</h2>
+<p><%= Time.current.strftime('%T') %></p>
+<p><%= link_to '他のページに遷移', home_case6_other_path %></p>
+<h2 class="mt-4">JSによる時間出力</h2>
+<script>
+  function outputTime() {
+    document.open()
+    const now = new Date()
+
+    document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
+    document.close()
+  }
+  outputTime()
+</script>
+
+<h2 class="mt-4">VueJSによるDOM操作の時間出力</h2>
+<div id="case6">
+  <test></test>
+</div>
+
+<h2 class="mt-4">豆知識</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+    <h3>結論</h3>
+    <ul>
+      <li>ページ自体にno-storeを設定してもブラウザのバックでAjaxによるデータ取得もキャッシュされてしまう</li>
+    </ul>
+  </div>
+</div>
+
+<%= javascript_pack_tag 'entries/test' %>

@@ -1,0 +1,55 @@
+<h1>Rails6のデフォルトの状態</h1>
+
+<h2 class="mt-4">Railsによる現在の時間</h2>
+
+<p><%= Time.current.strftime('%T') %></p>
+<p><%= link_to '他のページに遷移', home_case1_other_path %></p>
+
+<h2 class="mt-4">JSによる時間出力</h2>
+
+<script type="text/javascript" charset="utf-8">
+  function outputTime() {
+    document.open()
+    const now = new Date()
+
+    document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
+    document.close()
+  }
+  outputTime()
+</script>
+
+<h2 class="mt-4">豆知識</h2>
+
+<div class="group mt-4">
+
+  <div class="wysiwyg">
+    <h3>rails6のデフォルトの状態</h3>
+    <ul>
+      <li>Cache-Control: max-age=0, private, must-revalidate が設定されている</li>
+      <li>ETag: W/"d04b48981555dcc61607987d6fad9018" 何か文字が入ったETagが設定されている</li>
+      <li>上記だとブラウザの戻る、進むでキャッシュが発生(時間が変わらない)</li>
+    </ul>
+
+    <h3 class="mt-4">Cache-Controlが省略された場合</h3>
+    <ul>
+      <li>省略された場合は Cache-Control: no-cache と同様に作用します。</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Caching#The_Pragma_header</li>
+    </ul>
+
+
+    <h3 class="mt-4">must-revalidate</h3>
+    <ul>
+      <li>検証が成功しない限り、古くなったコピーを使用してはならないことを示します。</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control#Revalidation_and_reloading</li>
+    </ul>
+
+
+    <h3 class="mt-4">検証(ETag)</h3>
+    <ul>
+      <li>キャッシュされた文書の有効期限に達すると、検証または再取得を行います。</li>
+      <li>キャッシュの検証は、サーバーが strong validator または weak validator を提供していれば実行できます。</li>
+      <li>ETag レスポンスヘッダーは strong validator として使用できる、ユーザーエージェントにとって不透明な値です。</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Caching#Cache_validation</li>
+    </ul>
+  </div>
+</div>

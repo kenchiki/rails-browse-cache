@@ -1,25 +1,42 @@
 <h1>Cache-Control: no-cache, private, max-age=0を設定した場合</h1>
-<h2 class="mt-4">Railsによる現在の時間</h2>
-<p><%= Time.current.strftime('%T') %></p>
-<p><%= link_to '他のページに遷移', home_case3_other_path %></p>
-<h2 class="mt-4">JSによる時間出力</h2>
-<script>
-  function outputTime() {
-    document.open()
-    const now = new Date()
 
-    document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
-    document.close()
-  }
-  outputTime()
-</script>
+
+
+<h2 class="mt-4">実行結果</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+    <ul>
+      <li><strong>Railsから出力：</strong><%= Time.current.strftime('%T') %></li>
+      <li><strong>JSから出力：</strong>
+        <script type="text/javascript" charset="utf-8">
+          function outputTime() {
+            document.open()
+            const now = new Date()
+
+            document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
+            document.close()
+          }
+          outputTime()
+        </script>
+      </li>
+      <li><%= link_to '他のページに遷移', home_back_path %></li>
+    </ul>
+  </div>
+</div>
+
+
+<h2 class="mt-4">結論</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+    <ul>
+      <li><strong>no-cache</strong> でもブラウザの戻る、進むでキャッシュが残る</li>
+    </ul>
+  </div>
+</div>
+
 <h2 class="mt-4">豆知識</h2>
 <div class="group mt-4">
   <div class="wysiwyg">
-    <h3>結論</h3>
-    <ul>
-      <li>ブラウザの戻る、進むでキャッシュが残る</li>
-    </ul>
     <h3 class="mt-4">privateとは何か</h3>
     <ul>
       <li>ブラウザのキャッシュには格納できますが、 通常、対象ユーザーは 1 人のため、中間キャッシュに格納することは認められません。</li>
@@ -30,9 +47,33 @@
     </ul>
     <h3 class="mt-4">max-ageとは何か</h3>
     <ul>
-      <li>このディレクティブでは、取得したレスポンスを再使用できる最大時間を、リクエストの時刻を起点とする秒数で指定します。</li>
+      <li>取得したレスポンスを再使用できる最大時間を、リクエストの時刻を起点とする秒数で指定します。</li>
       <li>たとえば、"max-age=60" は、レスポンスを 60 秒間キャッシュに格納して再使用できることを示します。</li>
       <li>参考：https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=ja#%E3%80%8Cmax-age%E3%80%8D</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="mt-4">もっとマニアックな豆知識</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+
+    <h3 class="mt-4">no-cacheとno-storeの違いは何か？</h3>
+    <ul>
+      <li>no-cache：キャッシュとして使用する前に常にオリジンサーバーとの検証を通さなければならない。</li>
+      <li>no-store：レスポンスをキャッシュに保存することはできません。max-age=0 が暗黙で含まれます。</li>
+      <li>つまり、no-cacheは検証結果次第で、キャッシュを使用する可能性があるため、キャッシュを使わせないようにするにはno-storeの方を使う</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control</li>
+    </ul>
+    <h3 class="mt-4">no-cacheとmust-revalidateの違いは何か？</h3>
+    <ul>
+      <li>no-cache：キャッシュとして使用する前に常にオリジンサーバーとの検証を通さなければならない。</li>
+      <li>must-revalidate：キャッシュとして使用する前にキャッシュサーバー(なければオリジンサーバー)との検証を通さなければならない。</li>
+      <li>キャッシュサーバー(cloudfrontやnginxなどをリバースプロキシ)を使った時、検証のフローが変わってくる</li>
+      <li>検証に使われるのはIf-None-Match(ETag検証)、If-Modified-Since(Last-Modified検証)※max-ageは検証に関係ない</li>
+      <li>参考：https://www.ryotosaito.com/blog/?p=264</li>
+      <li>参考：https://www.ipa.go.jp/security/awareness/vendor/programmingv2/contents/405.html</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Caching#Cache_validation</li>
     </ul>
   </div>
 </div>

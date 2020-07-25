@@ -1,30 +1,79 @@
 <h1>ETagが固定または更新された場合</h1>
-<h2 class="mt-4">Railsによる現在の時間</h2>
-<p><%= Time.current.strftime('%T') %></p>
-<p><%= link_to '他のページに遷移', home_case5_other_path %></p>
-<p><%= link_to 'モデルを作成する(ETagの値を更新する)', home_case5_create_path %></p>
-<h2 class="mt-4">JSによる時間出力</h2>
-<script>
-  function outputTime() {
-    document.open()
-    const now = new Date()
 
-    document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
-    document.close()
-  }
-  outputTime()
-</script>
+
+
+
+<h2 class="mt-4">実行結果</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+    <ul>
+      <li><strong>Railsから出力：</strong><%= Time.current.strftime('%T') %></li>
+      <li><strong>JSから出力：</strong>
+        <script type="text/javascript" charset="utf-8">
+          function outputTime() {
+            document.open()
+            const now = new Date()
+
+            document.write(now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds())
+            document.close()
+          }
+          outputTime()
+        </script>
+      </li>
+      <li><%= link_to '他のページに遷移', home_back_path %></li>
+      <li><%= link_to 'ETagの値を更新する(モデルを作成する)', home_case5_create_path %></li>
+    </ul>
+  </div>
+</div>
+
+
+<h2 class="mt-4">結論</h2>
+<div class="group mt-4">
+  <div class="wysiwyg">
+    <ul>
+      <li>ETagの値が固定の場合はレスポンスコード304を返し(キャッシュを参照)され、ETagの値が更新された場合レスポンスコード200を返す(データをダウンロード)</li>
+      <li>Tagの値が固定の場合、no-storeと違ってリロードでもキャッシュは更新されなかった</li>
+      <li>(例外として強制更新のCtrl + F5※MacはCommand + Shift + r だと更新される)</li>
+    </ul>
+  </div>
+</div>
+
+
 <h2 class="mt-4">豆知識</h2>
 <div class="group mt-4">
   <div class="wysiwyg">
-    <h3>結論</h3>
+    <h3 class="mt-4">must-revalidate</h3>
     <ul>
-      <li>ETag(検証)の値が固定の場合は更新されず、更新された時にキャッシュは更新される</li>
-      <li>この場合、no-storeと違ってリロードでもキャッシュは更新されなかった(ctrl + F5※Macはcommand + shift + r だと更新される)</li>
+      <li>検証に成功するとレスポンスコード200を返す(つまり、サーバーからデータをダウンロードしてくる)</li>
+      <li>検証は <strong>ETag</strong> と <strong>Last-Modified</strong> の値をみる</li>
+      <li><strong>If-None-Match</strong> でETagの値を送信し、マッチしてない場合、ダウンロードされる</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control#Revalidation_and_reloading</li>
     </ul>
+    <h3 class="mt-4">ETag</h3>
+    <ul>
+      <li>デフォルトではETagは常に更新されてしまう</li>
+      <li>fresh_whenなどを使うとETagを固定することができる</li>
+      <li>fresh_whenによるETagの値はテンプレートファイルのダイジェスト(更新があるか)と渡すパラメータによって決定される</li>
+      <li>fresh_whenにModelのインスタンスを渡す場合、updated_atとcache_keyによってETagの値が決定する</li>
+      <li>キャッシュされた文書の有効期限(max-age)に達すると、検証または再取得を行います</li>
+      <li>参考：https://api.rubyonrails.org/v5.2.4.3/classes/ActionController/ConditionalGet.html#method-i-fresh_when</li>
+      <li>参考：https://railsguides.jp/caching_with_rails.html#%E5%A4%96%E9%83%A8%E3%81%AE%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Caching#Cache_validation</li>
+      <li>参考：https://qiita.com/cuzic/items/326e8600dc596de6636a</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="mt-4">もっとマニアックな豆知識</h2>
+
+<div class="group mt-4">
+  <div class="wysiwyg">
     <h3 class="mt-4">ETagとno-store一緒に設定した場合、どうなるか</h3>
     <ul>
-      <li>max-age=0 が暗黙で含まれます。 must-revalidate は意味を持ちません。再検証を行うにはレスポンスがキャッシュに格納されている必要がありますが、 no-store はこれを抑止するからです。</li>
+      <li>no-storeが設定されているとmax-age=0 が暗黙で含まれます</li>
+      <li>no-storeが設定されているとmust-revalidate は意味を持たない</li>
+      <li>再検証を行うにはレスポンスがキャッシュに格納されている必要がありますが、no-store はこれを抑止するからです。</li>
+      <li>そのためETagも意味を持たない。</li>
       <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Headers/Cache-Control#Cacheability</li>
     </ul>
     <h3 class="mt-4">ETagを削除することもできる</h3>
@@ -35,12 +84,18 @@
     </ul>
     <h3 class="mt-4">expires_in 10.secondsとfresh_when(Blog.last)を同時に使ったらどうなるか</h3>
     <ul>
-      <li>fresh_when(Blog.last)が優先されて、ETagの値は固定された</li>
-      <li>そのため、時間は固定された</li>
+      <li>fresh_when(Blog.last)でETagの値は固定されてキャッシュが残り続ける</li>
+      <li>max-ageは意味を持たない</li>
     </ul>
     <h3 class="mt-4">ETag固定の状態でctrl+F5(macだったらcommand+shift+r)を押すとどうなるか</h3>
     <ul>
-      <li>ETagの値は固定されたままだが、キャッシュは更新された</li>
+      <li>ETagの値は固定されたままだが、キャッシュはきちんと更新される</li>
+    </ul>
+
+    <h3 class="mt-4">Cache-Controlが省略された場合</h3>
+    <ul>
+      <li>省略された場合は Cache-Control: no-cache と同様に作用します。</li>
+      <li>参考：https://developer.mozilla.org/ja/docs/Web/HTTP/Caching#The_Pragma_header</li>
     </ul>
   </div>
 </div>
